@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingMessageDiv = document.getElementById('loading-message');
     const stationNameTitle = document.getElementById('station-name-title');
     const recentStationsList = document.getElementById('recent-stations-list');
+    const recentStationsDiv = document.getElementById('recent-stations');
+    const introductionSection = document.getElementById('blabla');
 
     let recentStations = JSON.parse(localStorage.getItem('recentStations') || '[]');
 
@@ -159,4 +161,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     displayRecentStations();
+
+    if (recentStations.length === 0) {
+        recentStationsDiv.style.display = 'none';
+    }
+
+    getTimesButton.addEventListener('click', () => {
+        introductionSection.style.display = 'none';
+    });
 });
