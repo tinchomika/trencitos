@@ -2,6 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const originStationInput = document.getElementById('origin-station');
     const getTimesButton = document.getElementById('get-times');
     const trainScheduleDiv = document.getElementById('train-schedule');
+    const loadingMessageDiv = document.getElementById('loading-message');
+    const stationNameTitle = document.getElementById('station-name-title');
+    const recentStationsList = document.getElementById('recent-stations-list');
+
+    let recentStations = JSON.parse(localStorage.getItem('recentStations') || '[]');
 
     const noTrainMessages = [
         "No hay más trenes por ahora.",
@@ -14,8 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
         "Anda llamando el uber...",
         "Tenías que salir antes...",
         "La vida es como un tren, a veces se va sin vos."
-
     ];
+
+    const loadingMessage = [
+        "Cargando...",
+        "Espere un momento...",
+        "Por favor, espere...",
+        "Aguanta un cacho..."
+    ]
 
     function getRandomMessage(messages) {
         return messages[Math.floor(Math.random() * messages.length)];
@@ -28,22 +39,37 @@ document.addEventListener('DOMContentLoaded', () => {
             trainScheduleDiv.innerHTML = `<div class="alert alert-warning text-center" role="alert"> Escribí de donde salis papu.'</div>`;
             return;
         }
+        loadingMessageDiv.innerHTML = getRandomMessage(loadingMessage);
+        loadingMessageDiv.style.display = 'block';
+        trainScheduleDiv.innerHTML = '';
 
         try {
-            const originStationId = await getStationId(originStationName);
+            const stationInfo = await getStationId(originStationName);
 
-            if (!originStationId) {
-                trainScheduleDiv.innerHTML = `<div class="alert alert-warning text-center" role="alert"> No se encontró la estación.'</div>`;
+            if (!stationInfo) {
+                loadingMessageDiv.style.display = 'none';
+                trainScheduleDiv.innerHTML = `<div class="alert alert-warning text-center" role="alert"> No se encontró la estación.</div>`;
                 return;
             }
 
-            const response = await fetch(`https://vhyhkns6n47tn6wlajsiht66m5vc5flne3qlkibmckgtpsu6dfza.ssh.surf/api/trains/stations/${originStationId}/schedules`);
+            stationNameTitle.textContent = stationInfo.name;
+
+            // Update recent stations
+            recentStations = recentStations.filter(station => station.id !== stationInfo.id);
+            recentStations.unshift({ id: stationInfo.id, name: stationInfo.name });
+            recentStations = recentStations.slice(0, 5);
+            localStorage.setItem('recentStations', JSON.stringify(recentStations));
+
+            displayRecentStations();
+
+            const response = await fetch(`https://vhyhkns6n47tn6wlajsiht66m5vc5flne3qlkibmckgtpsu6dfza.ssh.surf/api/trains/stations/${stationInfo.id}/schedules`);
             if (!response.ok) {
                 throw new Error('macana');
             }
             const data = await response.json();
 
             if (data.results.length === 0) {
+                loadingMessageDiv.style.display = 'none';
                 trainScheduleDiv.innerHTML = `<div class="alert alert-warning text-center" role="alert">${getRandomMessage(noTrainMessages)}</div>`;
                 return;
             }
@@ -98,10 +124,12 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             `;
             trainScheduleDiv.innerHTML = tableHTML;
+            loadingMessageDiv.style.display = 'none';
 
         } catch (error) {
             console.error('Error:', error);
             trainScheduleDiv.textContent = 'Error al solicitar horarios.';
+            loadingMessageDiv.style.display = 'none';
         }
     });
 
@@ -109,8 +137,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const response = await fetch(`https://vhyhkns6n47tn6wlajsiht66m5vc5flne3qlkibmckgtpsu6dfza.ssh.surf/api/trains/stations/search?nombre=${stationName}`);
         const data = await response.json();
         if (data && data.results && data.results.length > 0) {
-            return data.results[0].id;
+            return {
+                id: data.results[0].id,
+                name: data.results[0].nombre
+            };
         }
         return null;
     }
+
+    function displayRecentStations() {
+        recentStationsList.innerHTML = '';
+        recentStations.forEach(station => {
+            const li = document.createElement('li');
+            li.textContent = station.name;
+            li.addEventListener('click', () => {
+                originStationInput.value = station.name;
+                getTimesButton.click();
+            });
+            recentStationsList.appendChild(li);
+        });
+    }
+
+    displayRecentStations();
 });
