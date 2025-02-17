@@ -7,7 +7,7 @@ Esto es posible mediante el uso del bypasser de Ariedro. Todo esto es work in pr
 
 ## Roadmap (en orden de prioridad)
 
-- De momento estoy usando la API pública de Ariedro, ya me pongo las pilas y despliego mi propia instancia.
+- De momento estoy usando la API pública de Ariedro, ya me pongo las pilas y despliego mi propia instancia.✅
 
 - Mejorar la documentación y presentación del repositorio.
 
