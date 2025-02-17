@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const originStationName = originStationInput.value;
 
         if (!originStationName) {
-            trainScheduleDiv.innerHTML = `<div class="alert alert-warning text-center" role="alert"> Escribí de donde salis papu.'</div>`;
+            trainScheduleDiv.innerHTML = `<div class="alert alert-warning text-center" role="alert"> Escribí de donde salis papu.</div>`;
             return;
         }
         loadingMessageDiv.innerHTML = getRandomMessage(loadingMessage);
