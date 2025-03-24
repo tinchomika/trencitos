@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             displayRecentStations();
 
-            const response = await fetch(`https://7w36rckwf2qzdlzvfkmv52swnh5edl3edosr7l6hi7aru5nmnp2a.ssh.surf/estaciones/${stationInfo.id}/horarios`);
+            const response = await fetch(`https://7w36rckwf2qzdlzvfkmv52swnh5edl3edosr7l6hi7aru5nmnp2a.ssh.surf/arribos/estacion/${stationInfo.id}`);
             if (!response.ok) {
                 throw new Error('macana');
             }
@@ -136,12 +136,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function getStationId(stationName) {
-        const response = await fetch(`https://7w36rckwf2qzdlzvfkmv52swnh5edl3edosr7l6hi7aru5nmnp2a.ssh.surf/estaciones/buscar?nombre=${stationName}`);
+        const response = await fetch(`https://7w36rckwf2qzdlzvfkmv52swnh5edl3edosr7l6hi7aru5nmnp2a.ssh.surf/infraestructura/estaciones?nombre=${stationName}`);
         const data = await response.json();
-        if (data && data.results && data.results.length > 0) {
+        if (data && data && data.length > 0) {
             return {
-                id: data.results[0].id,
-                name: data.results[0].nombre
+                id: data[0].id_estacion,
+                name: data[0].nombre
             };
         }
         return null;
