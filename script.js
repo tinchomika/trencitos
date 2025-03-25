@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Error:', error);
-            trainScheduleDiv.textContent = '<div class="alert alert-warning text-center" role="alert">Error al solicitar horarios, intente de nuevo.</div>';
+            trainScheduleDiv.innerHTML = '<div class="alert alert-warning text-center" role="alert">Error al solicitar horarios, intente de nuevo.</div>';
             loadingMessageDiv.style.display = 'none';
         }
     });
