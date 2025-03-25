@@ -91,22 +91,41 @@ document.addEventListener('DOMContentLoaded', () => {
             const tableRows = [];
             for (const result of data.results) {
                 if (result.arribo && result.servicio) {
-                    const arrivalTimeUTC = result.arribo.llegada.estimada;
+                    const estArrivalTimeUTC = result.arribo.llegada.estimada;
+                    const progArrivalTimeUTC = result.arribo.llegada.programada;
                     const minutesRemaining = Math.floor(result.arribo.segundos / 60);
                     const direction = result.servicio.hasta.estacion.nombre;
 
-                    const arrivalTimeObj = new Date(arrivalTimeUTC);
-                    arrivalTimeObj.setHours(arrivalTimeObj.getHours());
-                    const arrivalTimeStr = arrivalTimeObj.toTimeString().split(' ')[0];
+                    const estArrivalTimeObj = new Date(estArrivalTimeUTC);
+                    const progArrivalTimeObj = new Date(progArrivalTimeUTC);
+                    estArrivalTimeObj.setHours(estArrivalTimeObj.getHours());
+                    progArrivalTimeObj.setHours(progArrivalTimeObj.getHours());
+                    const estArrivalTimeStr = estArrivalTimeObj.toTimeString().split(' ')[0];
+                    const progArrivalTimeStr = progArrivalTimeObj.toTimeString().split(' ')[0];
 
+                    if (estArrivalTimeStr === "Invalid") {
+                    
                     tableRows.push(`
                         <tr>
-                            <td>${arrivalTimeStr}</td>
+                            <td>${progArrivalTimeStr}</td>
+                            <td>-</td>
                             <td>${minutesRemaining}</td>
                             <td>${direction}</td>
                         </tr>
                     `);
+                    }
+                    else {
+                        tableRows.push(`
+                        <tr>
+                            <td>${progArrivalTimeStr}</td>
+                            <td>${estArrivalTimeStr}</td>
+                            <td>${minutesRemaining}</td>
+                            <td>${direction}</td>
+                        </tr>
+                    `);
+                    }
                 }
+                
             }
 
             const tableHTML = `
@@ -114,7 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <table class="table table-striped table-bordered">
                     <thead>
                         <tr>
-                            <th>Horario de llegada</th>
+                            <th>Horario de llegada programado</th>
+                            <th>Horario de llegada estimado</th>
                             <th>Minutos faltantes</th>
                             <th>Dirección</th>
                         </tr>
@@ -130,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Error:', error);
-            trainScheduleDiv.textContent = 'Error al solicitar horarios.';
+            trainScheduleDiv.textContent = '<div class="alert alert-warning text-center" role="alert">Error al solicitar horarios, intente de nuevo.</div>';
             loadingMessageDiv.style.display = 'none';
         }
     });
