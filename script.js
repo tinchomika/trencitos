@@ -78,22 +78,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Sort data by direction and arrival time
             data.results.sort((a, b) => {
-                const directionA = a.servicio.cabeceraFinal.nombre.toLowerCase();
-                const directionB = b.servicio.cabeceraFinal.nombre.toLowerCase();
+                const directionA = a.servicio.hasta.estacion.nombre.toLowerCase();
+                const directionB = b.servicio.hasta.estacion.nombre.toLowerCase();
                 if (directionA < directionB) return -1;
                 if (directionA > directionB) return 1;
 
-                const arrivalTimeA = new Date(a.desde.llegada);
-                const arrivalTimeB = new Date(b.desde.llegada);
+                const arrivalTimeA = new Date(a.arribo.llegada.estimada);
+                const arrivalTimeB = new Date(b.arribo.llegada.estimada);
                 return arrivalTimeA - arrivalTimeB;
             });
 
             const tableRows = [];
             for (const result of data.results) {
-                if (result.desde && result.servicio) {
-                    const arrivalTimeUTC = result.desde.llegada;
-                    const minutesRemaining = Math.floor(result.desde.segundos / 60);
-                    const direction = result.servicio.cabeceraFinal.nombre;
+                if (result.arribo && result.servicio) {
+                    const arrivalTimeUTC = result.arribo.llegada.estimada;
+                    const minutesRemaining = Math.floor(result.arribo.segundos / 60);
+                    const direction = result.servicio.hasta.estacion.nombre;
 
                     const arrivalTimeObj = new Date(arrivalTimeUTC);
                     arrivalTimeObj.setHours(arrivalTimeObj.getHours());
