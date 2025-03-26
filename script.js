@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function getRandomMessage(messages) {
         return messages[Math.floor(Math.random() * messages.length)];
     }
-
+    
     getTimesButton.addEventListener('click', async () => {
         const originStationName = originStationInput.value;
 
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('recentStations', JSON.stringify(recentStations));
 
             displayRecentStations();
-
+            // Get train times
             const response = await fetch(`https://7w36rckwf2qzdlzvfkmv52swnh5edl3edosr7l6hi7aru5nmnp2a.ssh.surf/arribos/estacion/${stationInfo.id}`);
             if (!response.ok) {
                 throw new Error('macana');
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const arrivalTimeB = new Date(b.arribo.llegada.estimada);
                 return arrivalTimeA - arrivalTimeB;
             });
-
+            // Time table creation
             const tableRows = [];
             for (const result of data.results) {
                 if (result.arribo && result.servicio) {
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingMessageDiv.style.display = 'none';
         }
     });
-
+    // Station search
     async function getStationId(stationName) {
         const response = await fetch(`https://7w36rckwf2qzdlzvfkmv52swnh5edl3edosr7l6hi7aru5nmnp2a.ssh.surf/infraestructura/estaciones?nombre=${stationName}`);
         const data = await response.json();
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return null;
     }
-
+    // Recent stations list
     function displayRecentStations() {
         recentStationsList.innerHTML = '';
         recentStations.forEach(station => {
