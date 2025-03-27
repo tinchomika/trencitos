@@ -90,11 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Check if final station. ex: Retiro
             let finalStation = true;
             for (const result of data.results) {
-                if (result.arribo && result.servicio) {
-                    if (result.arribo.llegada) {
-                        finalStation = false;
-                        break;
-                    }
+                if (result.arribo && result.arribo.llegada && Object.keys(result.arribo.llegada).length > 0) {
+                    finalStation = false;
+                    break;
                 }
             }
 
@@ -112,57 +110,57 @@ document.addEventListener('DOMContentLoaded', () => {
                 <th>Dirección</th>
             </tr>
             `;
-            // Time table creation
+            // Time schedule creation
             const tableRows = [];
             for (const result of data.results) {
                 if (result.arribo && result.servicio) {
                     const estArrivalTimeUTC = !finalStation && result.arribo.llegada ? result.arribo.llegada.estimada : null;
-                    const progArrivalTimeUTC = result.arribo.llegada.programada ? result.arribo.llegada.programada : result.arribo.salida.programada;
+                    const progArrivalTimeUTC = finalStation ? result.arribo.salida.programada : (result.arribo.llegada.programada || result.arribo.salida.programada);
                     const minutesRemaining = Math.floor(result.arribo.segundos / 60);
                     const direction = result.servicio.hasta.estacion.nombre;
 
-                    const estArrivalTimeObj = new Date(estArrivalTimeUTC);
                     const progArrivalTimeObj = new Date(progArrivalTimeUTC);
-                    estArrivalTimeObj.setHours(estArrivalTimeObj.getHours());
                     progArrivalTimeObj.setHours(progArrivalTimeObj.getHours());
-                    const estArrivalTimeStr = estArrivalTimeObj.toTimeString().split(' ')[0];
                     const progArrivalTimeStr = progArrivalTimeObj.toTimeString().split(' ')[0];
 
-                    if (estArrivalTimeStr === "Invalid") {
-
-                        tableRows.push(`
-                        <tr>
-                            <td>${progArrivalTimeStr}</td>
-                            <td>-</td>
-                            <td>${minutesRemaining}</td>
-                            <td>${direction}</td>
-                        </tr>
-                    `);
+                    let estArrivalTimeStr = "-";
+                    if (estArrivalTimeUTC) {
+                        const estArrivalTimeObj = new Date(estArrivalTimeUTC);
+                        estArrivalTimeObj.setHours(estArrivalTimeObj.getHours());
+                        estArrivalTimeStr = estArrivalTimeObj.toTimeString().split(' ')[0];
+                        if (estArrivalTimeStr === "Invalid") {
+                            estArrivalTimeStr = "-";
+                        }
                     }
-                    else {
+
+
+
+                    if (finalStation) {
                         tableRows.push(`
-                        <tr>
-                            <td>${progArrivalTimeStr}</td>
-                            <td>${estArrivalTimeStr}</td>
-                            <td>${minutesRemaining}</td>
-                            <td>${direction}</td>
-                        </tr>
-                    `);
+                            <tr>
+                                <td>${progArrivalTimeStr}</td>
+                                <td>${minutesRemaining}</td>
+                                <td>${direction}</td>
+                            </tr>
+                        `);
+                    } else {
+                        tableRows.push(`
+                            <tr>
+                                <td>${progArrivalTimeStr}</td>
+                                <td>${estArrivalTimeStr}</td>
+                                <td>${minutesRemaining}</td>
+                                <td>${direction}</td>
+                            </tr>
+                        `);
                     }
                 }
-
             }
 
             const tableHTML = `
             <div class="table-responsive">
                 <table class="table table-striped table-bordered">
                     <thead>
-                        <tr>
-                            <th>Horario de llegada programado</th>
-                            <th>Horario de llegada estimado</th>
-                            <th>Minutos faltantes</th>
-                            <th>Dirección</th>
-                        </tr>
+                        ${tableHeaders}
                     </thead>
                     <tbody>
                         ${tableRows.join('')}
@@ -172,13 +170,13 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             trainScheduleDiv.innerHTML = tableHTML;
             loadingMessageDiv.style.display = 'none';
-
         } catch (error) {
             console.error('Error:', error);
             trainScheduleDiv.innerHTML = '<div class="alert alert-warning text-center" role="alert">Error al solicitar horarios, intente de nuevo.</div>';
             loadingMessageDiv.style.display = 'none';
         }
     });
+
     // Station search
     async function getStationId(stationName) {
         const response = await fetch(`https://7w36rckwf2qzdlzvfkmv52swnh5edl3edosr7l6hi7aru5nmnp2a.ssh.surf/infraestructura/estaciones?nombre=${stationName}`);
