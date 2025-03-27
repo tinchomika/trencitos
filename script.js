@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function getRandomMessage(messages) {
         return messages[Math.floor(Math.random() * messages.length)];
     }
-    
+
     getTimesButton.addEventListener('click', async () => {
         const originStationName = originStationInput.value;
 
@@ -87,12 +87,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 const arrivalTimeB = new Date(b.arribo.llegada.estimada);
                 return arrivalTimeA - arrivalTimeB;
             });
+            // Check if final station. ex: Retiro
+            let finalStation = true;
+            for (const result of data.results) {
+                if (result.arribo && result.servicio) {
+                    if (result.arribo.llegada) {
+                        finalStation = false;
+                        break;
+                    }
+                }
+            }
+
+            const tableHeaders = finalStation ? `
+            <tr>
+                <th>Horario de salida programado</th>
+                <th>Minutos faltantes</th>
+                <th>Dirección</th>
+            </tr>
+            ` : `
+            <tr>
+                <th>Horario de llegada programado</th>
+                <th>Horario de llegada estimado</th>
+                <th>Minutos faltantes</th>
+                <th>Dirección</th>
+            </tr>
+            `;
             // Time table creation
             const tableRows = [];
             for (const result of data.results) {
                 if (result.arribo && result.servicio) {
-                    const estArrivalTimeUTC = result.arribo.llegada.estimada;
-                    const progArrivalTimeUTC = result.arribo.llegada.programada;
+                    const estArrivalTimeUTC = !finalStation && result.arribo.llegada ? result.arribo.llegada.estimada : null;
+                    const progArrivalTimeUTC = result.arribo.llegada.programada ? result.arribo.llegada.programada : result.arribo.salida.programada;
                     const minutesRemaining = Math.floor(result.arribo.segundos / 60);
                     const direction = result.servicio.hasta.estacion.nombre;
 
@@ -104,8 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const progArrivalTimeStr = progArrivalTimeObj.toTimeString().split(' ')[0];
 
                     if (estArrivalTimeStr === "Invalid") {
-                    
-                    tableRows.push(`
+
+                        tableRows.push(`
                         <tr>
                             <td>${progArrivalTimeStr}</td>
                             <td>-</td>
@@ -125,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     `);
                     }
                 }
-                
+
             }
 
             const tableHTML = `
