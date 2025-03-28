@@ -213,3 +213,25 @@ document.addEventListener('DOMContentLoaded', () => {
         introductionSection.style.display = 'none';
     });
 });
+
+//version checker for script
+const CURRENT_VERSION = '1.0.0';
+async function checkVersion() {
+  try {
+    const response = await fetch('https://raw.githubusercontent.com/tinchomika/trencitos/main/current_ver.json?nocache=');
+    const data = await response.json();
+    
+    if (data.version !== CURRENT_VERSION) {
+      console.log('Nueva versión disponible:', data.version, "Novedades:", data.changelog);
+      if (confirm('Hay una nueva versión disponible. ¿Deseas recargar la página ahora?')) {
+        localStorage.clear();
+        location.reload(true);
+      }
+    }
+  } catch (error) {
+    console.error('Error verificando versión:', error);
+  }
+}
+
+
+window.addEventListener('load', checkVersion);
