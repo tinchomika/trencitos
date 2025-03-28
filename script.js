@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
 const CURRENT_VERSION = '1.0.0';
 async function checkVersion() {
   try {
-    const response = await fetch('https://raw.githubusercontent.com/tinchomika/trencitos/main/current_ver.json?nocache=');
+    const response = await fetch('https://raw.githubusercontent.com/tinchomika/trencitos/main/current_ver.json?nocache');
     const data = await response.json();
     
     if (data.version !== CURRENT_VERSION) {
