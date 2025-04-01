@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Version checker
-const CURRENT_VERSION = '1.0.1';
+const CURRENT_VERSION = '1.0.2';
 const debug = false;
 async function checkVersion() {
   try {
