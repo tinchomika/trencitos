@@ -214,20 +214,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-//version checker for script
-const CURRENT_VERSION = '1.0.0';
+// Version checker
+const CURRENT_VERSION = '1.0.1';
+const debug = false;
 async function checkVersion() {
   try {
     const response = await fetch('https://raw.githubusercontent.com/tinchomika/trencitos/main/current_ver.json?nocache');
     const data = await response.json();
     
-    if (data.version !== CURRENT_VERSION) {
-      console.log('Nueva versión disponible:', data.version, "Novedades:", data.changelog);
-      if (confirm('Hay una nueva versión disponible. ¿Deseas recargar la página ahora?')) {
-        localStorage.clear();
-        location.reload(true);
-      }
+    if (data.version !== CURRENT_VERSION || debug) {
+        document.getElementById('version').style.display = 'block';
+        document.getElementById('version').innerHTML = `
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <strong>Nueva versión disponible:</strong> ${data.version}<br>
+            <strong>Novedades:</strong> ${data.changelog}<br>
+            <button type="button" class="btn btn-primary btn-sm mt-2" onclick="localStorage.clear(); location.reload(true);">Actualizar</button>
+        `;
+        document.getElementById('version').classList.add('show');
+        
+        console.log('Nueva versión disponible:', data.version, "Novedades:", data.changelog);
     }
+
   } catch (error) {
     console.error('Error verificando versión:', error);
   }
