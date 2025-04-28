@@ -64,9 +64,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             displayRecentStations();
             // Get train times
-            const response = await fetch(`https://7w36rckwf2qzdlzvfkmv52swnh5edl3edosr7l6hi7aru5nmnp2a.ssh.surf/arribos/estacion/${stationInfo.id}`);
-            if (!response.ok) {
-                throw new Error('macana');
+            let response;
+            try {
+                response = await fetch(`https://q577sqkq5cdxxskrjl4nwvy2prcgdnew22u7pdkxucauf4ae2fcq.ssh.surf/arribos/estacion/${stationInfo.id}`);
+                if (!response.ok) {
+                    throw new Error('API primaria caída :(');
+                }
+            } catch (error) {
+                console.warn('API primaria caída, intentando fallback:', error);
+                response = await fetch(`https://ariedro.dev/api-trenes/arribos/estacion/${stationInfo.id}`);
+                if (!response.ok) {
+                    throw new Error('Se pudrió todo, no anda el servidor de Ariedro o sofse se puso la gorra');
+                }
             }
             const data = await response.json();
 
@@ -179,13 +188,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Station search
     async function getStationId(stationName) {
-        const response = await fetch(`https://7w36rckwf2qzdlzvfkmv52swnh5edl3edosr7l6hi7aru5nmnp2a.ssh.surf/infraestructura/estaciones?nombre=${stationName}`);
-        const data = await response.json();
-        if (data && data && data.length > 0) {
-            return {
-                id: data[0].id_estacion,
-                name: data[0].nombre
-            };
+        try {
+            const response = await fetch(`https://q577sqkq5cdxxskrjl4nwvy2prcgdnew22u7pdkxucauf4ae2fcq.ssh.surf/infraestructura/estaciones?nombre=${stationName}`);
+            if (!response.ok) {
+                throw new Error('API primaria caída :(');
+            }
+            const data = await response.json();
+            if (data && data.length > 0) {
+                return {
+                    id: data[0].id_estacion,
+                    name: data[0].nombre
+                };
+            }
+        } catch (error) {
+            console.warn('API primaria caída, intentando fallback:', error);
+            const response = await fetch(`https://ariedro.dev/api-trenes/arribos/estacion/${stationName}`);
+            if (!response.ok) {
+                throw new Error('Se pudrió todo, no anda el servidor de Ariedro o sofse se puso la gorra');
+            }
+            const data = await response.json();
+            if (data && data.length > 0) {
+                return {
+                    id: data[0].id_estacion,
+                    name: data[0].nombre
+                };
+            }
         }
         return null;
     }
@@ -215,11 +242,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Version checker
-const CURRENT_VERSION = '1.0.2';
+const CURRENT_VERSION = '1.0.3';
 const debug = false;
 async function checkVersion() {
   try {
-    const response = await fetch('https://raw.githubusercontent.com/tinchomika/trencitos/main/current_ver.json?nocache');
+    const response = await fetch('https://raw.githack.com/tinchomika/trencitos/main/current_ver.json');
     const data = await response.json();
     
     if (data.version !== CURRENT_VERSION || debug) {

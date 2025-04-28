@@ -1,4 +1,4 @@
 {
-    "version": "1.0.2",
-    "changelog": "Convertida la página a PWA ¡Intenta instalarla!"
+    "version": "1.0.3",
+    "changelog": "cambio de servidor api + implementación fallback en caso de error"
   }
