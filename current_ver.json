@@ -1,4 +1,4 @@
 {
-    "version": "1.0.3",
-    "changelog": "cambio de servidor api + implementación fallback en caso de error"
+    "version": "1.0.4",
+    "changelog": "Mantenimiento :)"
   }
