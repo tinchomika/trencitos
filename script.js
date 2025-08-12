@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Get train times
             let response;
             try {
-                response = await fetch(`https://2a0b-4e07-8-1--8a6.ipv4.virtnet.host/trencitos/arribos/estacion/${stationInfo.id}`);
+                response = await fetch(`https://ariedro.dev/api-trenes/arribos/estacion/${stationInfo.id}`);
                 if (!response.ok) {
                     throw new Error('API primaria caída :(');
                 }
@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Station search
     async function getStationId(stationName) {
         try {
-            const response = await fetch(`https://2a0b-4e07-8-1--8a6.ipv4.virtnet.host/trencitos/infraestructura/estaciones?nombre=${stationName}`);
+            const response = await fetch(`https://ariedro.dev/api-trenes/infraestructura/estaciones?nombre=${stationName}`);
             if (!response.ok) {
                 throw new Error('API primaria caída :(');
             }
